@@ -2,6 +2,7 @@ import socket
 import zlib, pickle
 import zmq
 import time
+import struct
 
 
 class ZMQValuePub(object):
@@ -14,7 +15,7 @@ class ZMQValuePub(object):
         self.name = name
         self.socket = context.socket(zmq.PUB)
         self.socket.set_hwm(hwm)
-        self.socket.bind("tests://*:%d" % port)
+        self.socket.bind("tcp://*:%d" % port)
 
     def run(self, values):
         packet = {"name": self.name, "val": values}
@@ -38,7 +39,7 @@ class ZMQValueSub(object):
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
         self.socket.set_hwm(hwm)
-        self.socket.connect("tests://%s:%d" % (ip, port))
+        self.socket.connect("tcp://%s:%d" % (ip, port))
         self.socket.setsockopt_string(zmq.SUBSCRIBE, '')
         self.name = name
         self.return_last = return_last
@@ -125,6 +126,7 @@ class UDPValueSub(object):
 
     def poll(self):
         data, addr = self.client.recvfrom(1024 * 65)
+
         # print("got", len(data), "bytes")
         if len(data) > 0:
             p = zlib.decompress(data)
@@ -143,7 +145,7 @@ import select
 
 class TCPServeValue(object):
     '''
-    Use tests to serve values on local network
+    Use tcp to serve values on local network
     '''
 
     def __init__(self, name, port=3233):
@@ -178,13 +180,12 @@ class TCPServeValue(object):
 
         if len(ready_to_write) > 0:
             packet = {"name": self.name, "val": values}
-            p = pickle.dumps(packet)
-            z = zlib.compress(p)
+            # p = pickle.dumps(packet)
+            # z = zlib.compress(p)
+            data = encode_data(packet)
             for client in ready_to_write:
                 try:
-                    #TODO: SEND TCPUtil.encode_data(packet) -> RECEIVE AS IN client.py
-                    # /-> Check if data is usable [ ImgArrToJpg() in case of 'camera' ]
-                    self.send(client, z)
+                    self.send(client, data)
                 except BrokenPipeError or ConnectionResetError:
                     print("client dropped connection")
                     self.clients.remove(client)
@@ -205,7 +206,7 @@ class TCPServeValue(object):
 
 class TCPClientValue(object):
     '''
-    Use tests to get values on local network
+    Use tcp to get values on local network
     '''
 
     def __init__(self, name, host, port=3233):
@@ -413,8 +414,8 @@ def test_udp_broadcast(ip):
     if ip is None:
         print("udp broadcast test..")
         p = UDPValuePub('camera')
-        from donkey.camera import PiCamera
-        from donkey.image import ImgArrToJpg
+        from donkeycar.parts.camera import PiCamera
+        from donkeycar.parts.image import ImgArrToJpg
         cam = PiCamera(160, 120, 3)
         img_conv = ImgArrToJpg()
         time.sleep(1)
@@ -438,8 +439,8 @@ def test_udp_broadcast(ip):
 def test_tcp_client_server(ip):
     if ip is None:
         p = TCPServeValue("camera")
-        from donkey.camera import PiCamera
-        from donkey.image import ImgArrToJpg
+        from donkeycar.parts.camera import PiCamera
+        from donkeycar.parts.image import ImgArrToJpg
         cam = PiCamera(160, 120, 3)
         img_conv = ImgArrToJpg()
         while True:
@@ -457,9 +458,9 @@ def test_tcp_client_server(ip):
 def test_mqtt_pub_sub(ip):
     if ip is None:
         print("publishing test..")
-        p = MQTTValuePub('_donkey_files/camera')
-        from donkey.camera import PiCamera
-        from donkey.image import ImgArrToJpg
+        p = MQTTValuePub('donkey/camera')
+        from donkeycar.parts.camera import PiCamera
+        from donkeycar.parts.image import ImgArrToJpg
         cam = PiCamera(160, 120, 3)
         img_conv = ImgArrToJpg()
         while True:
@@ -470,12 +471,20 @@ def test_mqtt_pub_sub(ip):
 
     else:
         print("subscribing test..")
-        s = MQTTValueSub('_donkey_files/camera')
+        s = MQTTValueSub('donkey/camera')
 
         while True:
             res = s.run()
             print("got:", res)
             time.sleep(0.1)
+
+
+def encode_data(data):
+    """Encodes data to be sent via TCP socket"""
+    raw_data = pickle.dumps(data)
+    compressed = zlib.compress(raw_data)
+    message = struct.pack("Q", len(compressed)) + compressed
+    return message
 
 
 if __name__ == "__main__":
@@ -499,3 +508,5 @@ if __name__ == "__main__":
     # test_udp_broadcast(ip)
     # test_mqtt_pub_sub(ip)
     test_tcp_client_server(ip)
+
+
