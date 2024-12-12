@@ -6,8 +6,11 @@ import cv2
 
 
 class Yolo(Listener):
-    def __init__(self):
+    def __init__(self, width, height, yolo_verbose):
         super().__init__()
+        self.width = width
+        self.height = height
+        self.yolo_verbose = yolo_verbose
 
         # Registration of this class as a listener
         api.listener.listener.get_registry().register_listener(self)
@@ -34,11 +37,7 @@ class Yolo(Listener):
             return
 
         # Frame resizing, analyzing with YOLO and displaying
-        resized_frame = cv2.resize(event.frame, (640, 480))
-        results = self.model(resized_frame, verbose=False)
+        resized_frame = cv2.resize(event.frame, (self.width, self.height))
+        results = self.model(resized_frame, verbose=self.yolo_verbose)
         annotated_frame = results[0].plot()
         cv2.imshow("YOLO Detection on TCP Stream", annotated_frame)
-
-
-def start():
-    Yolo()
