@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from api.listener.event import Event
+
 
 # Todo: Add priority
 class Listener(ABC):
@@ -13,15 +15,14 @@ class ListenerRegistry:
     def __init__(self):
         self._listeners = []
 
-    def register_listener(self, listener):
-        assert isinstance(listener, Listener), "Can not register non-listener object as listener."
+    def register_listener(self, listener: Listener):
         self._listeners.append(listener)
 
-    def notify_listeners(self, event):
+    def notify_listeners(self, event: Event):
         for listener in self._listeners:
             listener.handleEvent(event)
 
-    def unregister_listener(self, listener):
+    def unregister_listener(self, listener: Listener):
         self._listeners.remove(listener)
 
 

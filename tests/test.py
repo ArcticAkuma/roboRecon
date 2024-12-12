@@ -1,8 +1,8 @@
-from api.listener.listener import CameraFrameReceivedEvent
+from api.listener.event import SocketDataReceivedEvent
 import api.listener.listener
 
 def handle_frame(event):
-    if isinstance(event, CameraFrameReceivedEvent):
+    if isinstance(event, SocketDataReceivedEvent):
         print(event.name)
 
 def reg():

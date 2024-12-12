@@ -1,8 +1,13 @@
-from api.listener.event import FrameReceivedEvent
-from api.listener.listener import ListenerRegistry, Listener
-import api.listener
-from ultralytics import YOLO
+import io
+
+import PIL.Image as Image
 import cv2
+import numpy as np
+from ultralytics import YOLO
+
+import api.listener
+from api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
+from api.listener.listener import ListenerRegistry, Listener
 
 
 class Yolo(Listener):
@@ -11,9 +16,6 @@ class Yolo(Listener):
         self.width = width
         self.height = height
         self.yolo_verbose = yolo_verbose
-
-        # Registration of this class as a listener
-        api.listener.listener.get_registry().register_listener(self)
 
         # Preparation of YOLO model
         self.model = YOLO("../../tests/yolo-Weights/yolov8n.pt")
@@ -32,12 +34,17 @@ class Yolo(Listener):
                            "teddy bear", "hair drier", "toothbrush"
                            ]
 
-    def handleEvent(self, event):
-        if not isinstance(event, FrameReceivedEvent):
-            return
+        # Registration of this class as a listener
+        api.listener.listener.get_registry().register_listener(self)
 
-        # Frame resizing, analyzing with YOLO and displaying
-        resized_frame = cv2.resize(event.frame, (self.width, self.height))
-        results = self.model(resized_frame, verbose=self.yolo_verbose)
-        annotated_frame = results[0].plot()
-        cv2.imshow("YOLO Detection on TCP Stream", annotated_frame)
+    def handleEvent(self, event):
+        if isinstance(event, SocketStateChangeEvent):
+            # Todo handle client disconnect -> apply to img shown
+            pass
+
+        if isinstance(event, SocketDataReceivedEvent) and event.channel == "camera":
+            # Frame resizing, analyzing with YOLO and displaying
+            resized_frame = cv2.resize(np.array(Image.open(io.BytesIO(event.data))), (self.width, self.height))
+            results = self.model(resized_frame, verbose=self.yolo_verbose)
+            annotated_frame = results[0].plot()
+            cv2.imshow("YOLO Detection on TCP Stream", annotated_frame)

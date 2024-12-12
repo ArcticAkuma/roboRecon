@@ -3,6 +3,7 @@ import cv2
 import threading
 from api.util import util
 
+"""THIS IS A DUMMY SERVER AND NOT COMPATIBLE WITH CURRENT DONKEY IMPLEMENTATION DUE TO DATA STRUCTURE"""
 
 def handle_client(conn, addr, cap):
     """Handles communication with a single client."""
@@ -31,7 +32,7 @@ def start_server(host='0.0.0.0', port=3233):
     server_socket.listen(5)  # Allows 5 pending connections
     print(f"Server listening on {host}:{port}")
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(2)
 
     try:
         while True:

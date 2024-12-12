@@ -15,12 +15,12 @@ if __name__ == "__main__":
     yolo_verbose = config['yolo']['console-logging']
 
     # Todo: create application (system part) object with start and stop functionality
+    print(f"Starting YOLO service with console-logging == {yolo_verbose}")
+    Yolo(yolo_width, yolo_height, yolo_verbose)
+
     print(f"Trying to connect to server at {hostname}:{port}..")
     client = VideoStreamClient(hostname, port)
     client.start()
-
-    print(f"Starting YOLO service with console-logging == {yolo_verbose}")
-    Yolo(yolo_width, yolo_height, yolo_verbose)
 
     cmd_line = ""
     while cmd_line != "exit" and cmd_line != "quit":
