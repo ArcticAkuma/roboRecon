@@ -1,5 +1,6 @@
 import socket
 import struct
+import threading
 
 import cv2
 
@@ -7,13 +8,17 @@ import api.listener.listener
 from api.listener.event import FrameReceivedEvent
 from api.util import util
 
-
+online = True
 class VideoStreamClient:
     def __init__(self, host, port):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect((host, port))
+        print("Client connected!")
         self.data = b""
         self.payload_size = struct.calcsize("Q")
+
+        self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True
 
     def read(self):
         # Read the frame size
@@ -38,30 +43,22 @@ class VideoStreamClient:
 
     def release(self):
         self.client_socket.close()
+        print("Connection closed.")
 
+    def run(self):
+        try:
+            global online
+            while online:
+                self.read()
+                if cv2.waitKey(1) & 0xFF == 27:  # Exit on ESC key
+                    break
+        finally:
+            self.release()
 
-def start_client(host='127.0.0.1', port=3233):
-    stream = VideoStreamClient(host, port)
+    def start(self):
+        self.thread.start()
 
-    try:
-        while True:
-            stream.read()
-            if cv2.waitKey(1) & 0xFF == 27:  # Exit on ESC key
-                break
-    finally:
-        stream.release()
-
-# if __name__ == "__main__":
-#     from src.yolo import Yolo
-#
-#     Yolo()
-#     stream = VideoStreamClient("127.0.0.1", 3233)
-#
-#     try:
-#         while True:
-#             stream.read()
-#             if cv2.waitKey(1) & 0xFF == 27:  # Exit on ESC key
-#                 break
-#     finally:
-#         stream.release()
-#         cv2.destroyAllWindows()
+    def stop(self):
+        global online
+        online = False
+        self.release()

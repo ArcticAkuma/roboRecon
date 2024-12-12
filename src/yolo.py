@@ -14,6 +14,7 @@ class Yolo(Listener):
 
         # Preparation of YOLO model
         self.model = YOLO("../../tests/yolo-Weights/yolov8n.pt")
+
         self.classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat",
                            "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat",
                            "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack",
@@ -34,7 +35,7 @@ class Yolo(Listener):
 
         # Frame resizing, analyzing with YOLO and displaying
         resized_frame = cv2.resize(event.frame, (640, 480))
-        results = self.model(resized_frame)
+        results = self.model(resized_frame, verbose=False)
         annotated_frame = results[0].plot()
         cv2.imshow("YOLO Detection on TCP Stream", annotated_frame)
 

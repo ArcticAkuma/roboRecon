@@ -1,15 +1,23 @@
-import threading
-import api.tcp.server
-import api.tcp.client
-import src.yolo
+from api.tcp.client import VideoStreamClient
+from src.yolo import Yolo
+
+# todo: config
+host = "127.0.0.1"
+port = 3233
 
 if __name__ == "__main__":
-    # Starting YOLO in separate thread
-    yolo_thread = threading.Thread(target=src.yolo.start)
-    yolo_thread.daemon = True  # Ensure the thread exits when the program exits
-    yolo_thread.start()
-    print("#2")
+    print(f"Trying to connect to server at {host}:{port}..")
+    client = VideoStreamClient(host, port)
+    client.start()
 
-    # Starting client, initializing connection
-    api.tcp.client.start_client("127.0.0.1", 3233)
+    print("Starting YOLO service..")
+    Yolo()
 
+    cmd_line = ""
+    while cmd_line != "exit" and cmd_line != "quit":
+        cmd_line = input("\n\nType exit to exit\n")
+
+    print("Closing applications...")
+    client.stop()
+
+# Todo: create application (system part) object with start and stop functionality
