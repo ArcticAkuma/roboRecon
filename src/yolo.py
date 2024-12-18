@@ -44,6 +44,10 @@ class Yolo(Listener):
 
         if isinstance(event, SocketDataReceivedEvent) and event.channel == "camera":
 
+
+            #import rgbdslam.slam as slam
+            #slam.combine_rgb_depth()
+
             # Frame resizing, analyzing with YOLO and displaying
             resized_frame = cv2.resize(np.array(Image.open(io.BytesIO(event.data['img']))), (self.width, self.height))
             results = self.model(resized_frame, verbose=self.yolo_verbose)
