@@ -1,5 +1,3 @@
-from matplotlib.pyplot import connect
-
 from api.util.util import ConnectionState
 
 class Event:

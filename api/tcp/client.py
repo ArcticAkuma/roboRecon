@@ -58,7 +58,7 @@ class VideoStreamClient:
             self.data, decoded = util.decode_data(self.data, msg_size)
             if len(decoded) > 0:
                 api.listener.listener.get_registry().notify_listeners(
-                    SocketDataReceivedEvent(decoded['name'], decoded['val']))
+                    SocketDataReceivedEvent(decoded['name'], { "img": decoded['img'], "depth": decoded['depth'] }))
         except socket.error:
             self.handle_disconnect()
 
