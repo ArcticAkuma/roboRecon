@@ -169,7 +169,7 @@ class TCPServeValue(object):
 
         # print("sent", len(msg), "bytes")
 
-    def run(self, values):
+    def run(self, img_arr, depth_arr):
         timeout = 0.05
         ready_to_read, ready_to_write, in_error = \
             select.select(
@@ -179,7 +179,7 @@ class TCPServeValue(object):
                 timeout)
 
         if len(ready_to_write) > 0:
-            packet = {"name": self.name, "val": values}
+            packet = {"name": self.name, "img": img_arr, "depth": depth_arr}
             # p = pickle.dumps(packet)
             # z = zlib.compress(p)
             data = encode_data(packet)
