@@ -43,8 +43,9 @@ class Yolo(Listener):
             pass
 
         if isinstance(event, SocketDataReceivedEvent) and event.channel == "camera":
+
             # Frame resizing, analyzing with YOLO and displaying
-            resized_frame = cv2.resize(np.array(Image.open(io.BytesIO(event.data))), (self.width, self.height))
+            resized_frame = cv2.resize(np.array(Image.open(io.BytesIO(event.data['img']))), (self.width, self.height))
             results = self.model(resized_frame, verbose=self.yolo_verbose)
             annotated_frame = results[0].plot()
             cv2.imshow("YOLO Detection on TCP Stream", annotated_frame)
