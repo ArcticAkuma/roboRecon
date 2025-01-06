@@ -14,7 +14,7 @@ import cv2
 from scipy.spatial.transform import Rotation
 from scipy.optimize import minimize
 
-from src.tests.slam.post_process import post_process_speed_and_yaw
+from __old.src.tests.slam import post_process_speed_and_yaw
 
 
 def load_intrinsics(intrinsics_path: str) -> np.ndarray:

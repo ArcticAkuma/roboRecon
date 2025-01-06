@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from api.listener.event import Event
+from __old.api.listener.event import Event
 
 
 # Todo: Add priority

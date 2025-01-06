@@ -1,5 +1,5 @@
 donkey-server:
-  hostname: '192.168.171.127'
+  hostname: '192.168.2.211'
   port: 3233
 yolo:
   # 640x480 is the default and recommended configuration for YOLO.

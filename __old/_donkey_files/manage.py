@@ -35,8 +35,6 @@ from donkeycar.parts.behavior import BehaviorPart
 from donkeycar.parts.file_watcher import FileWatcher
 from donkeycar.parts.launch import AiLaunch
 from donkeycar.parts.kinematics import NormalizeSteeringAngle, UnnormalizeSteeringAngle, TwoWheelSteeringThrottle
-from donkeycar.parts.kinematics import Unicycle, InverseUnicycle, UnicycleUnnormalizeAngularVelocity
-from donkeycar.parts.kinematics import Bicycle, InverseBicycle, BicycleUnnormalizeAngularVelocity
 from donkeycar.parts.explode import ExplodeDict
 from donkeycar.parts.transform import Lambda
 from donkeycar.parts.pipe import Pipe
@@ -72,7 +70,7 @@ def drive(cfg, model_path=None, use_joystick=False, model_type=None,
             model_type = cfg.DEFAULT_MODEL_TYPE
 
     # Initialize car
-    V = dk.vehicle.Vehicle()
+    V = altered_files.donkeycar.vehicle.Vehicle()
 
     # Initialize logging before anything else to allow console logging
     if cfg.HAVE_CONSOLE_LOGGING:

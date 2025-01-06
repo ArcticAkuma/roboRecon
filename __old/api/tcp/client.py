@@ -5,10 +5,10 @@ import time
 
 import cv2
 
-import api.listener.listener
-from api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
-from api.util import util
-import api.util.util
+import __old.api.listener.listener
+from __old.api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
+from __old.api.util import util
+import __old.api.util.util
 
 online = True
 
@@ -32,7 +32,7 @@ class VideoStreamClient:
                 self.connected = True
                 print("Client connected!")
 
-                api.listener.listener.get_registry().notify_listeners(
+                __old.api.listener.listener.get_registry().notify_listeners(
                     SocketStateChangeEvent(util.ConnectionState.CONNECTED))
             except socket.error:
                 print("Failed to connect. Retrying in 5 seconds...")
@@ -57,7 +57,7 @@ class VideoStreamClient:
 
             self.data, decoded = util.decode_data(self.data, msg_size)
             if len(decoded) > 0:
-                api.listener.listener.get_registry().notify_listeners(
+                __old.api.listener.listener.get_registry().notify_listeners(
                     SocketDataReceivedEvent(decoded['name'], { "img": decoded['img'], "depth": decoded['depth'] }))
         except socket.error:
             self.handle_disconnect()
@@ -68,7 +68,7 @@ class VideoStreamClient:
         self.connected = False
         self.client_socket.close()
 
-        api.listener.listener.get_registry().notify_listeners(
+        __old.api.listener.listener.get_registry().notify_listeners(
             SocketStateChangeEvent(util.ConnectionState.DISCONNECTED))
         self.connect()
 
@@ -76,7 +76,7 @@ class VideoStreamClient:
         """Closes the socket connection."""
         if self.client_socket:
             self.client_socket.close()
-            api.listener.listener.get_registry().notify_listeners(
+            __old.api.listener.listener.get_registry().notify_listeners(
                 SocketStateChangeEvent(util.ConnectionState.DISCONNECTED))
         print("Connection closed.")
 

@@ -6,8 +6,8 @@ import numpy as np
 from ultralytics import YOLO
 
 import api.listener
-from api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
-from api.listener.listener import ListenerRegistry, Listener
+from __old.api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
+from __old.api.listener.listener import ListenerRegistry, Listener
 
 
 class Yolo(Listener):
@@ -35,7 +35,7 @@ class Yolo(Listener):
                            ]
 
         # Registration of this class as a listener
-        api.listener.listener.get_registry().register_listener(self)
+        __old.api.listener.listener.get_registry().register_listener(self)
 
     def handleEvent(self, event):
         if isinstance(event, SocketStateChangeEvent):
