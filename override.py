@@ -1,6 +1,7 @@
 import importlib.util
 import logging
 import os
+import shutil
 import sys
 
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -14,7 +15,7 @@ def in_venv():
 def pkg_exists(name):
     return name in sys.modules or importlib.util.find_spec(name)
 
-def inject_donkey():
+def override_donkey():
     if not in_venv():
         logger.warning("Not running inside of an virtual environment!")
         val = input("Continue anyway? [y/n]")
@@ -31,10 +32,10 @@ def inject_donkey():
     if (pkg_exists("pyfiglet")):
         from pyfiglet import Figlet
         f = Figlet(font='big')
-        print(f.renderText('INJECTION WARNING'))
+        print(f.renderText('OVERRIDE WARNING'))
     else:
-        print('\nINJECTION WARNING\n')
-    print(f"Injecting files at: {donkey_path!r}")
+        print('\nOVERRIDE WARNING\n')
+    print(f"Overriding files at: {donkey_path!r}")
     print('Please make sure the path above is correct and you have a backup of all files at this location.')
     print('Proceed on your own risk.\n')
     print('THIS STEP CAN NOT BE REVERTED!')
@@ -48,15 +49,19 @@ def inject_donkey():
             from_path = os.path.join(path, name)
             to_path = os.path.join(path, name).replace(ALTERED_PATH, donkey_path)
 
-            #if not os.path.exists(to_path):
-                #os.makedirs(to_path)
+            if not os.path.exists(to_path):
+                logger.warning("Missing directory: ", to_path)
+                val = input("Continue anyway? [y/n]")
+                if val != "y" and val != "yes":
+                    continue
+                os.makedirs(to_path)
 
             print(f"Coping {from_path} to {to_path}")
-            #shutil.copyfile(from_path, to_path)
-            counter=+1
+            shutil.copyfile(from_path, to_path)
+            counter+=1
 
-    print("\nINJECTION COMPLETE")
+    print("\nOVERRIDE COMPLETE")
     print(f"This program altered {counter!r} file(s).")
 
 if __name__ == "__main__":
-    inject_donkey()
+    override_donkey()
