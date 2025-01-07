@@ -9,6 +9,7 @@ ALTERED_PATH = os.path.join(PROJECT_PATH, 'altered_files/donkeycar')
 
 logger = logging.getLogger(__name__)
 
+# 
 def in_venv():
     return sys.prefix != sys.base_prefix
 
