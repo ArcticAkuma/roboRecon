@@ -5,12 +5,16 @@ then
 source /opt/ros/noetic/setup.bash
 fi
 
-if [ -z "$(rosnode list | grep 'realsense')" ]; then
+list="$(rosnode list | grep 'realsense')"
+if [ ! -z "$list" ] && [[ ! "$list" == ERROR* ]]; then
   echo  "Realsense node already online."
-else
+  exit 1
+fi
+
 if [ ! "$#" -eq 0 ] && [ "$1" = "offline" ]; then
-    roslaunch realsense2_camera opensource_tracking.launch offline:=true
-  else
-    roslaunch realsense2_camera opensource_tracking.launch
-  fi
+  echo "Starting realsense node in offline mode.."
+  roslaunch realsense2_camera opensource_tracking.launch offline:=true
+else
+  echo "Starting realsense node.."
+  roslaunch realsense2_camera opensource_tracking.launch
 fi

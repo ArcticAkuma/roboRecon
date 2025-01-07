@@ -5,7 +5,7 @@ import shutil
 import sys
 
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
-ALTERED_PATH = os.path.join(PROJECT_PATH, 'altered_files/donkeycar')
+ALTERED_PATH = os.path.join(PROJECT_PATH, '../altered_files/donkeycar')
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ def override_donkey():
         print(f.renderText('OVERRIDE WARNING'))
     else:
         print('\nOVERRIDE WARNING\n')
-    print(f"Overriding files at: {donkey_path!r}")
+    print(f"Overriding files at: {donkey_path}")
     print('Please make sure the path above is correct and you have a backup of all files at this location.')
     print('Proceed on your own risk.\n')
     print('THIS STEP CAN NOT BE REVERTED!')
@@ -45,24 +45,31 @@ def override_donkey():
         return
 
     counter = 0
+    new_folders = 0
+    new_files = 0
     for path, sub_dirs, files in os.walk(ALTERED_PATH):
         for name in files:
             from_path = os.path.join(path, name)
             to_path = os.path.join(path, name).replace(ALTERED_PATH, donkey_path)
 
-            if not os.path.exists(to_path):
-                logger.warning("Missing directory: ", to_path)
+            dir = os.path.split(to_path)[0]
+            if not os.path.exists(dir):
+                logger.warning(f"Folder does not exist in donkeycar: {dir}")
                 val = input("Continue anyway? [y/n]")
                 if val != "y" and val != "yes":
                     continue
-                os.makedirs(to_path)
+                os.makedirs(dir)
+                new_folders+=1
 
+            if not os.path.exists(to_path):
+                new_files+=1
             print(f"Coping {from_path} to {to_path}")
             shutil.copyfile(from_path, to_path)
             counter+=1
 
     print("\nOVERRIDE COMPLETE")
-    print(f"This program altered {counter!r} file(s).")
+    print(f"This program altered {counter} file(s).")
+    print(f"{new_folders} new folder(s) and {new_files} new file(s) were created.")
 
 if __name__ == "__main__":
     override_donkey()

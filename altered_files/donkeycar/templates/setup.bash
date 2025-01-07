@@ -30,8 +30,8 @@ else
   exit 1
 fi
 
-export ROS_MASTER_URI="$addr"
-echo "   >> ROS_MASTER_URI configured as: ${addr}"
+export ROS_MASTER_URI="http://$addr:11311"
+echo "   >> ROS_MASTER_URI configured as: ${addr}:11311"
 export ROS_IP="$addr"
 echo "   >> ROS_IP configured as: ${addr}"
 
