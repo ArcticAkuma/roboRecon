@@ -5,10 +5,8 @@ import time
 
 import cv2
 
-import __old.api.listener.listener
-from __old.api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
-from __old.api.util import util
-import __old.api.util.util
+from api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
+from api.util import util
 
 online = True
 

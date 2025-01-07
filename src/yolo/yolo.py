@@ -5,9 +5,8 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-import api.listener
-from __old.api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
-from __old.api.listener.listener import ListenerRegistry, Listener
+from api.listener.event import SocketDataReceivedEvent, SocketStateChangeEvent
+from api.listener.listener import Listener
 
 
 class Yolo(Listener):

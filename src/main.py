@@ -1,5 +1,5 @@
 from api.tcp.client import VideoStreamClient
-from src.yolo import Yolo
+from src.yolo.yolo import Yolo
 
 import yaml
 

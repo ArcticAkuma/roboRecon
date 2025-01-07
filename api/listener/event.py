@@ -1,4 +1,4 @@
-from __old.api.util.util import ConnectionState
+from api.util.util import ConnectionState
 
 class Event:
     """Basic event class every event extends from."""
