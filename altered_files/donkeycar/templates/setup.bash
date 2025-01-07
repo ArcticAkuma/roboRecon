@@ -17,17 +17,23 @@ echo "   >> ROS noetic initialized"
 eth0="$(ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')"
 wlan0="$(ifconfig wlan0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')"
 
+addr=""
 if [ ! -z "$eth0" ]; then
-  export ROS_IP=$eth0
-  echo "   >> ROS_IP configured to eth0-address: ${eth0}"
+  addr="$eth0"
 elif [ ! -z "$wlan0" ]; then
-  export ROS_IP=$wlan0
-  echo "   >> ROS_IP configured to wlan0-address: ${wlan0}"
+   addr="$wlan0"
 else
   echo "   >> Unable to fetch network IP"
   echo "   >> Please configure ROS_IP accordingly"
+  echo ""
+  echo ""
+  exit 1
 fi
 
+export ROS_MASTER_URI="$addr"
+echo "   >> ROS_MASTER_URI configured as: ${addr}"
+export ROS_IP="$addr"
+echo "   >> ROS_IP configured as: ${addr}"
 
 echo ""
 echo ""

@@ -13,5 +13,4 @@ if [ ! "$#" -eq 0 ] && [ "$1" = "offline" ]; then
   else
     roslaunch realsense2_camera opensource_tracking.launch
   fi
-  roslaunch realsense2_camera opensource_tracking.launch
 fi
