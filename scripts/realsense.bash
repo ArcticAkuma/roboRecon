@@ -5,4 +5,9 @@ then
 source /opt/ros/noetic/setup.bash
 fi
 
-roslaunch realsense2_camera opensource_tracking.launch
+if [ -z "$(rosnode list | grep 'realsense')" ]
+then
+  echo  "Realsense node already online."
+else
+  roslaunch realsense2_camera opensource_tracking.launch
+fi
