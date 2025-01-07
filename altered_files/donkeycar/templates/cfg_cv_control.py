@@ -1,7 +1,7 @@
 """
 PATH FOLLOWING: 'path_follow' template configurations
 
-# This file is read by your car application's manage.py script to change the car
+# This file is read by your car application's manage.py scripts to change the car
 # performance
 
 # If desired, all config overrides can be specified here. 

@@ -65,7 +65,7 @@ class CreateCar(BaseCommand):
 
     def create_car(self, path, template='complete', overwrite=False):
         """
-        This script sets up the folder structure for donkey to work.
+        This scripts sets up the folder structure for donkey to work.
         It must run without donkey installed so that people installing with
         docker can build the folder structure for docker to mount to.
         """
@@ -101,6 +101,11 @@ class CreateCar(BaseCommand):
             shutil.copyfile(app_template_path, car_app_path)
             os.chmod(car_app_path, stat.S_IRWXU)
 
+            ### ALTERED START ###
+            # Copy RoboRecon project scripts in every newly created instance.
+            # By doing this the robot startup can be done from within on directory simplifying the process quite a bit.
+            # Additionally, all files are condensed in one place making it easier to keep an overview.
+
             shutil.copyfile(os.path.join(TEMPLATES_PATH, 'realsense.bash'), os.path.join(path, 'realsense.bash'))
             os.chmod(os.path.join(path, 'realsense.bash'), stat.S_IEXEC)
             shutil.copyfile(os.path.join(TEMPLATES_PATH, 'record.bash'), os.path.join(path, 'record.bash'))
@@ -110,6 +115,7 @@ class CreateCar(BaseCommand):
             shutil.copyfile(os.path.join(TEMPLATES_PATH, 'setup.bash'), os.path.join(path, 'setup.bash'))
             os.chmod(os.path.join(path, 'setup.bash'), stat.S_IEXEC)
 
+            ### ALTERED END ###
 
         if os.path.exists(car_config_path) and not overwrite:
             print('Car config already exists. Delete it and rerun createcar to replace.')
@@ -120,14 +126,14 @@ class CreateCar(BaseCommand):
         if os.path.exists(train_app_path) and not overwrite:
             print('Train already exists. Delete it and rerun createcar to replace.')
         else:
-            print("Copying train script. Adjust these before starting your car.")
+            print("Copying train scripts. Adjust these before starting your car.")
             shutil.copyfile(train_template_path, train_app_path)
             os.chmod(train_app_path, stat.S_IRWXU)
 
         if os.path.exists(calibrate_app_path) and not overwrite:
             print('Calibrate already exists. Delete it and rerun createcar to replace.')
         else:
-            print("Copying calibrate script. Adjust these before starting your car.")
+            print("Copying calibrate scripts. Adjust these before starting your car.")
             shutil.copyfile(calibrate_template_path, calibrate_app_path)
             os.chmod(calibrate_app_path, stat.S_IRWXU)
 

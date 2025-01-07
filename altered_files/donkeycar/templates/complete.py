@@ -876,12 +876,21 @@ def add_camera(V, cfg, camera_type):
                        'imu/gyr_x', 'imu/gyr_y', 'imu/gyr_z'],
               threaded=True)
 
+    ### ALTERED START ###
+    # Add possibility to implement Intel Realsense D435 camera via own part.
+    # This makes it possible to feed data from ROS into this instance.
+
     elif cfg.CAMERA_TYPE == "D435_ROS":
         print('[RoboRecon] Initializing ROS node...')
         print('[RoboRecon] This might take some time.')
+
+        # Publishing ROS data to support donkey parts reliant on it.
+        # The rgb image and depth image is forwarded here.
         from donkeycar.parts.robo_recon import RosReceiver
         cam = RosReceiver()
         V.add(cam, inputs=[], outputs=['cam/image_array', 'cam/depth_array'], threaded=True)
+
+    ### ALTERED END ###
 
     else:
         inputs = []

@@ -3,6 +3,8 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from tensorflow.python.ops.metrics_impl import true_positives
 
+### SELF-MAINTAINED
+
 class RosReceiver:
     def __init__(self):
         self.depth_subscriber = None
