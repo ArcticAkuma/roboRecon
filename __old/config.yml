@@ -1,9 +1,0 @@
-donkey-server:
-  hostname: '192.168.2.211'
-  port: 3233
-yolo:
-  # 640x480 is the default and recommended configuration for YOLO.
-  # Please revert to these values in case of error.
-  width: 640
-  height: 480
-  console-logging: False
