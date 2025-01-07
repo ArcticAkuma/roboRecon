@@ -13,7 +13,7 @@ They are applied through a simple script overriding changed classes directly in 
 This basic solution was mainly developed to simplify grading of the project by condensing self-modified files only.
 
 ````shell
-pyton override.py
+python override.py
 ````
 
 ### Grading
@@ -21,7 +21,7 @@ All self-created or 'significantly' altered files in [/altered_files](https://gi
 Please note, this annotation will be limited to this package only. Files in other packages are self-created.
 This should make it easier to find relevant code by e.g. searching for this markdown in an IDE.</p>
 *Legacy branches will not be marked like this. Expect all files there to be self-created 
-apart from those clearly in subdirectories named accordingly to the origin software.*
+apart from those clearly in sub-packages named accordingly to the origin software.*
 
 #### Self-created files:
 ````python
