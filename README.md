@@ -33,7 +33,7 @@ apart from those clearly in sub-packages named accordingly to the origin softwar
             print('grading_example')
         
         #<explanation>
-        def grading_example:
+        def grading_example(self):
             pass
 ````
 #### Altered files:
