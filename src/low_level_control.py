@@ -9,6 +9,7 @@ from i2cpwm_board.msg import Servo, ServoArray
 from geometry_msgs.msg import Twist
 import time
 
+# todo: as as config for different input sources (if existent)
 # SERVO VALUES
 #
 # STEERING IDLE	350
@@ -25,7 +26,9 @@ import time
 # MAX message.linear.x  +/- 1.5
 # MAX message.angular.z +/- 0.4
 
-class ServoConvert():
+IDLE_TIMEOUT = 5
+
+class ServoConvert:
     def __init__(self, id=1, center_value=333, range=90, direction=1, max_value=1.0):
         self.value      = 0.0
         self.value_out  = center_value
@@ -36,18 +39,12 @@ class ServoConvert():
         self._dir       = direction
         self.id         = id
 
-        #--- Convert its range in [-1, 1]
-        self._sf        = 1.0/self._half_range
-
     def get_value_out(self, value_in):
-        #--- value is in [-1, 1]
-        self.value      = value_in/self._max_value
-        rospy.logerr("Servo value in: %.2f" % self.value)
+        self.value = value_in/self._max_value
         self.value_out  = int(self._dir*self.value*self._half_range + self._center)
-        #print (self.id, self.value_out)
-        return(self.value_out)
+        return self.value_out
 
-class DkLowLevelCtrl():
+class DkLowLevelCtrl:
     def __init__(self):
         rospy.loginfo("Setting Up the Node...")
 
@@ -57,26 +54,25 @@ class DkLowLevelCtrl():
         # todo: load from ROS parameter (this are PS5 settings)
         self.actuators['throttle']  = ServoConvert(id=8, center_value=330, range=60, max_value=1.5)
         self.actuators['steering']  = ServoConvert(id=9, center_value=350, range=80, max_value=0.4) #-- positive left
-        rospy.loginfo("> Actuators corrrectly initialized")
+        rospy.loginfo("> Actuators correctly initialized")
 
-        self._servo_msg       = ServoArray()
+        self._servo_msg = ServoArray()
         for i in range(2): self._servo_msg.servos.append(Servo())
 
         #--- Create the servo array publisher
         self.ros_pub_servo_array    = rospy.Publisher("/servos_absolute", ServoArray, queue_size=1)
-        rospy.loginfo("> Publisher corrrectly initialized")
+        rospy.loginfo("> Publisher correctly initialized")
 
         #--- Create the Subscriber to Twist commands
-        self.ros_sub_twist          = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmdvel)
-        rospy.loginfo("> Subscriber corrrectly initialized")
+        self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmd_vel)
+        rospy.loginfo("> Subscriber correctly initialized")
 
         #--- Get the last time e got a commands
-        self._last_time_cmd_rcv     = time.time()
-        self._timeout_s             = 5
+        self._last_time_cmd_rcv = time.time()
 
         rospy.loginfo("Initialization complete")
 
-    def set_actuators_from_cmdvel(self, message):
+    def set_actuators_from_cmd_vel(self, message):
         """
         Get a message from cmd_vel, assuming a maximum input of 1
         """
@@ -107,7 +103,7 @@ class DkLowLevelCtrl():
     @property
     def is_controller_connected(self):
         #print (time.time() - self._last_time_cmd_rcv)
-        return(time.time() - self._last_time_cmd_rcv < self._timeout_s)
+        return time.time() - self._last_time_cmd_rcv < IDLE_TIMEOUT
 
     def run(self):
 
@@ -122,5 +118,5 @@ class DkLowLevelCtrl():
             rate.sleep()
 
 if __name__ == "__main__":
-    dk_llc     = DkLowLevelCtrl()
+    dk_llc = DkLowLevelCtrl()
     dk_llc.run()
