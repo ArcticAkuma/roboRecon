@@ -1,0 +1,7 @@
+<launch>
+
+    <node pkg="i2cpwm_board" type="i2cpwm_board" name="i2cBoard"/>
+    <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
+    <node pkg="robo_recon" type="low_level_control.py" name="roboReconController"/>
+
+</launch>
