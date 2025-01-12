@@ -1,0 +1,53 @@
+<!-- LOOK UP HERE:
+  - https://dev.intelrealsense.com/docs/ros1-wrapper
+  - https://github.com/introlab/rtabmap_ros/blob/noetic-devel/rtabmap_launch/launch/rtabmap.launch
+  - https://github.com/cra-ros-pkg/robot_localization/blob/noetic-devel/params/ukf_template.yaml
+  -->
+
+
+<launch>
+    <arg name="offline"          default="false"/>
+    <include unless="$(arg offline)"
+        file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="align_depth" value="true"/>
+    </include>
+
+    <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="DepthImgToLaserScan">
+        <remap from="image" to="/camera/aligned_depth_to_color/image_raw"/>
+    </node>
+
+    <node pkg="i2cpwm_board" type="i2cpwm_board" name="i2cBoard"/>
+    <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
+    <node pkg="robo_recon" type="low_level_control.py" name="roboReconController"/>
+
+    <node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
+        <param name="use_mag" type="bool" value="false" />
+        <param name="_publish_tf" type="bool" value="false" />
+        <param name="_world_frame" type="string" value="enu" />
+    </node>
+
+    <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+        <arg name="args" value="--delete_db_on_start"/>
+        <arg name="rgb_topic" value="/camera/color/image_raw"/>
+        <arg name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/>
+        <arg name="camera_info_topic" value="/camera/color/camera_info"/>
+        <arg name="depth_camera_info_topic" value="/camera/depth/camera_info"/>
+        <arg name="rtabmapviz" value="false"/>
+        <arg name="rviz" value="true"/>
+    </include>
+
+    <include file="$(find robot_localization)/launch/ukf_template.launch"/>
+    <param name="/ukf_se/frequency" value="300"/>
+    <param name="/ukf_se/base_link_frame" value="camera_link"/>
+    <param name="/ukf_se/odom0" value="rtabmap/odom"/>
+    <rosparam param="/ukf_se/odom0_config">[true,true,true,
+                                            true,true,true,
+                                            true,true,true,
+                                            true,true,true,
+                                            true,true,true]
+    </rosparam>
+    <param name="/ukf_se/odom0_relative" value="true"/>
+    <param name="/ukf_se/odom0_pose_rejection_threshold" value="10000000"/>
+    <param name="/ukf_se/odom0_twist_rejection_threshold" value="10000000"/>
+    <param name="/ukf_se/use_control" value="false"/>
+</launch>
