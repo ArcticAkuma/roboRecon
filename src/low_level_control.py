@@ -1,15 +1,11 @@
 #!/usr/bin/python
 
-"""
-Class for low level control of our car. It assumes ros-12cpwmboard has been
-installed
-"""
 import rospy
 from i2cpwm_board.msg import Servo, ServoArray
 from geometry_msgs.msg import Twist
 import time
 
-# todo: as as config for different input sources (if existent)
+# todo: as ROS parameters for different input sources (if existent)
 # SERVO VALUES
 #
 # STEERING IDLE	350
@@ -28,95 +24,124 @@ import time
 
 IDLE_TIMEOUT = 5
 
+
+# Object to store servo data.
 class ServoConvert:
+    """
+    Object to store servo data.
+    """
+
     def __init__(self, id=1, center_value=333, range=90, direction=1, max_value=1.0):
-        self.value      = 0.0
-        self.value_out  = center_value
-        self._center    = center_value
-        self._range     = range
-        self._half_range= 0.5*range
+        self.value = 0.0
+        self.value_out = center_value
+        self._center = center_value
+        self._range = range
+        self._half_range = 0.5 * range
         self._max_value = max_value
-        self._dir       = direction
-        self.id         = id
+        self._dir = direction
+        self.id = id
 
     def get_value_out(self, value_in):
-        self.value = value_in/self._max_value
-        self.value_out  = int(self._dir*self.value*self._half_range + self._center)
+        """
+        Calculate steering signal for servo based on received value.
+        Value is generated using servo idle signal and adding/subtracting normalized target value multiplied by range.
+        """
+        self.value = value_in / self._max_value
+        self.value_out = int(self._dir * self.value * self._half_range + self._center)
         return self.value_out
 
-class DkLowLevelCtrl:
+
+class ServoController:
     def __init__(self):
+        """
+        Initialize {$ServoConvert} object for every servo.
+        Configure ROS node: Register publisher and subscriber node.
+        Initialize last controller input as current time to fore one idle update.
+        """
         rospy.loginfo("Setting Up the Node...")
 
         rospy.init_node('i2c_controller')
 
-        self.actuators = {}
+        self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=1.5),
+                          'steering': ServoConvert(id=9, center_value=350, range=80, max_value=0.4)}
         # todo: load from ROS parameter (this are PS5 settings)
-        self.actuators['throttle']  = ServoConvert(id=8, center_value=330, range=60, max_value=1.5)
-        self.actuators['steering']  = ServoConvert(id=9, center_value=350, range=80, max_value=0.4) #-- positive left
-        rospy.loginfo("> Actuators correctly initialized")
-
         self._servo_msg = ServoArray()
-        for i in range(2): self._servo_msg.servos.append(Servo())
+        # TODO TEST IMPLEMENTATION
+        # for i in range(len(self.actuators)):
+        for i in range(2):
+            self._servo_msg.servos.append(Servo())
 
-        #--- Create the servo array publisher
-        self.ros_pub_servo_array    = rospy.Publisher("/servos_absolute", ServoArray, queue_size=1)
-        rospy.loginfo("> Publisher correctly initialized")
-
-        #--- Create the Subscriber to Twist commands
+        self.ros_pub_servo_array = rospy.Publisher("/servos_absolute", ServoArray, queue_size=1)
         self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmd_vel)
-        rospy.loginfo("> Subscriber correctly initialized")
 
-        #--- Get the last time e got a commands
         self._last_time_cmd_rcv = time.time()
 
         rospy.loginfo("Initialization complete")
 
     def set_actuators_from_cmd_vel(self, message):
         """
-        Get a message from cmd_vel, assuming a maximum input of 1
+        Called when geometry_msgs/Twist message is received on /cmd_vel topic
+        Time of last controller input received is updated here.
+        Generate steering information, to enable requested steering.
         """
-        #-- Save the time
+
         self._last_time_cmd_rcv = time.time()
 
-        #-- Convert vel into servo values
         self.actuators['throttle'].get_value_out(message.linear.x)
         self.actuators['steering'].get_value_out(message.angular.z)
-        #rospy.loginfo("Got a command v = %2.1f  s = %2.1f"%(message.linear.x, message.angular.z))
         self.send_servo_msg()
 
     def set_actuators_idle(self):
-        #-- Convert vel into servo values
+        """
+        Generate steering information, to set both servos to idle.
+        """
         self.actuators['throttle'].get_value_out(0)
         self.actuators['steering'].get_value_out(0)
-        rospy.loginfo("Setting actutors to idle")
         self.send_servo_msg()
 
     def send_servo_msg(self):
+        """
+        Sends converted steering information to servos.
+        geometry_msgs/Twist converted data will be sent on topic /servos_absolute.
+        """
+
+        """
+        TODO TEST IMPLEMENTATION
+        for i in range(len(self.actuators)):
+            self._servo_msg.servos[i].servo = self.actuators[i].id
+            self._servo_msg.servos[i].value = self.actuators[i].value_out
+        """
+
         for actuator_name, servo_obj in self.actuators.items():
-            self._servo_msg.servos[servo_obj.id-8].servo = servo_obj.id
-            self._servo_msg.servos[servo_obj.id-8].value = servo_obj.value_out
-            rospy.loginfo("Sending to %s command %d"%(actuator_name, servo_obj.value_out))
+            self._servo_msg.servos[servo_obj.id - 8].servo = servo_obj.id
+            self._servo_msg.servos[servo_obj.id - 8].value = servo_obj.value_out
 
         self.ros_pub_servo_array.publish(self._servo_msg)
 
     @property
     def is_controller_connected(self):
-        #print (time.time() - self._last_time_cmd_rcv)
+        """
+        Checks if controller is still available/online.
+        Returns true as long as a signal was received in the last {$IDLE_TIMEOUT} seconds.
+        """
         return time.time() - self._last_time_cmd_rcv < IDLE_TIMEOUT
 
     def run(self):
-
-        #--- Set the control rate
+        """
+        Starts ROS node functionality and adds update rate.
+        """
         rate = rospy.Rate(10)
-
         while not rospy.is_shutdown():
-            #print (self._last_time_cmd_rcv, self.is_controller_connected)
             if not self.is_controller_connected:
+                """
+                Reset of output steering signal to servo to idle value if controller is offline.
+                This prevents runaway situations in case no further steering data is received.
+                """
                 self.set_actuators_idle()
 
             rate.sleep()
 
+
 if __name__ == "__main__":
-    dk_llc = DkLowLevelCtrl()
-    dk_llc.run()
+    controller = ServoController()
+    controller.run()
