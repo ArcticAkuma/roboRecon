@@ -6,18 +6,15 @@
 
 
 <launch>
-    <arg name="offline"          default="false"/>
     <arg name="controller"          default="true"/>
 
-    <group unless="$(arg offline)">
-        <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-            <arg name="align_depth" value="true"/>
-        </include>
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="align_depth" value="true"/>
+    </include>
 
-        <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="DepthImgToLaserScan">
-            <remap from="image" to="/camera/aligned_depth_to_color/image_raw"/>
-        </node>
-    </group>
+    <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="DepthImgToLaserScan">
+        <remap from="image" to="/camera/aligned_depth_to_color/image_raw"/>
+    </node>
 
     <group if="$(arg controller)">
         <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
