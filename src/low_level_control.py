@@ -87,6 +87,9 @@ class ServoController:
 
         self._last_time_cmd_rcv = time.time()
 
+        print("THROTTLE: ", message.linear.x)
+        print("STEERING: ", message.linear.z)
+
         self.actuators['throttle'].get_value_out(message.linear.x)
         self.actuators['steering'].get_value_out(message.angular.z)
         self.send_servo_msg()

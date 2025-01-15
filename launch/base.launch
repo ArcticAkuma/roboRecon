@@ -34,7 +34,6 @@
     </include>
 
     <include file="$(find robot_localization)/launch/ukf_template.launch"/>
-    <!--todo: check if 30 is file (camera @ 30fps)-->
     <param name="/ukf_se/frequency" value="30"/>
     <param name="/ukf_se/base_link_frame" value="camera_link"/>
     <param name="/ukf_se/odom0" value="rtabmap/odom"/>
@@ -46,9 +45,8 @@
     </rosparam>
     <!--todo: check if valid: true -> zero point on start up-->
     <param name="/ukf_se/odom0_relative" value="true"/>
-    <!--todo: check if can be removed/set to default-->
+    <!-- todo: check if needed
     <param name="/ukf_se/odom0_pose_rejection_threshold" value="10000000"/>
-    <!--todo: check if can be removed/set to default-->
-    <param name="/ukf_se/odom0_twist_rejection_threshold" value="10000000"/>
+    <param name="/ukf_se/odom0_twist_rejection_threshold" value="10000000"/> -->
     <param name="/ukf_se/use_control" value="false"/>
 </launch>
