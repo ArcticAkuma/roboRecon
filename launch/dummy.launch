@@ -31,7 +31,6 @@
                                             true,true,true,
                                             true,true,true]
     </rosparam>
-    <!--todo: check if valid: true -> zero point on start up-->
     <param name="/ukf_se/odom0_relative" value="false"/>
     <!-- todo: check if needed
     <param name="/ukf_se/odom0_pose_rejection_threshold" value="10000000"/>
