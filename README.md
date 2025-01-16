@@ -5,14 +5,14 @@
 ### Project Overview
 This repository is part of a minor-level university project focused on the implementation of an autonomous RC car. 
 The primary goal of the project is to design and build a self-driving RC car equipped with Simultaneous Localization and Mapping (SLAM) and navigation capabilities. 
-The implementation utilizes ROS1 Noetic running locally on an NVIDIA Jetson Nano Xavier.<p>
+The implementation utilizes [ROS1 Noetic](http://wiki.ros.org/noetic) running locally on an [NVIDIA Jetson Nano Xavier NX](https://www.nvidia.com/de-de/autonomous-machines/embedded-systems/jetson-xavier-nx/).<p>
 
-Due to hardware-limitations this implementation is designed to function with a single sensor: the Intel RealSense D435 depth camera. 
+Due to hardware-limitations this implementation is designed to function with a single sensor: the [Intel RealSense D435](https://www.intelrealsense.com/depth-camera-d435/) depth camera. 
 The D435 provides both depth and RGB data, which is used for SLAM, obstacle detection, and navigation. 
 
 ### Hardware
 The car uses two servos, one for steering and another for throttle, which are managed via an Electronic Speed Controller (ESC).
-A PCA9685 PWM module is deployed to control these servos. 
+An [Adafruit PCA9685](https://www.adafruit.com/product/815) PWM module is deployed to control these servos. 
 The core computational tasks are handled by the NVIDIA Jetson Nano Xavier, which processes the sensor data and runs the software stack. 
 The car's only sensor is the Intel RealSense D435 depth camera.<p>
 
@@ -21,7 +21,12 @@ The absence of additional sensors, such as a LiDAR, means that the system has to
 A multi-sensor setup could significantly improve the accuracy, reliability, and overall capabilities of the car.
 
 ### Prerequisites
-This project relies heavily on other ROS packages, so we have to install them first:
+**General:**
+* Nvidia JetPack 5.1.4 (Ubuntu 20.04)
+* PCA9685 driver
+* ROS Noetic
+
+**ROS packages:**
 * **librealsense2:** ```sudo apt install ros-noetic-librealsense2*```
 * **realsense2:** ```sudo apt install ros-noetic-realsense2-*```
 * **robot_localization:** ```sudo apt install ros-noetic-robot-localization```
@@ -31,6 +36,8 @@ This project relies heavily on other ROS packages, so we have to install them fi
 * **joy:** ```todo```
 
 ### Usage
+Please be aware, that the i2c addresses of the servos are currently hard-coded with no possibility to be changed from the launch file.
+You may need to adjust them [here](src/low_level_control.py#L60).
 1. **Start SLAM & navigation**<p>
     Currently, there is no automatic goal finding.<br/> 
     Set it by publishing a [geometry_msgs/PoseStamped](https://docs.ros.org/en/api/geometry_msgs/html/msg/PoseStamped.html) to the navigation [move_base](http://wiki.ros.org/move_base#Action_Subscribed_Topics) on move_base_simple/goal.

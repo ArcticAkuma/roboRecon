@@ -53,6 +53,7 @@ class ServoController:
         """
 
         rospy.init_node('i2c_controller')
+        # todo: cfg -> pin_throttle, pin_steering
         max_throttle = rospy.get_param('~max_throttle', 1)
         max_steering = rospy.get_param('~max_steering', 1)
         rospy.loginfo("Setting Up the Node...")
