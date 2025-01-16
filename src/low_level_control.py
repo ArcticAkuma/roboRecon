@@ -62,12 +62,10 @@ class ServoController:
 
         rospy.init_node('i2c_controller')
 
-        self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=1.5),
-                          'steering': ServoConvert(id=9, center_value=350, range=80, max_value=0.4)}
+        self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=1),
+                          'steering': ServoConvert(id=9, center_value=355, range=80, max_value=1)}
         # todo: load from ROS parameter (this are PS5 settings)
         self._servo_msg = ServoArray()
-        # TODO TEST IMPLEMENTATION
-        # for i in range(len(self.actuators)):
         for i in range(2):
             self._servo_msg.servos.append(Servo())
 
@@ -87,8 +85,7 @@ class ServoController:
 
         self._last_time_cmd_rcv = time.time()
 
-        print("THROTTLE: ", message.linear.x)
-        print("STEERING: ", message.linear.z)
+        rospy.logwarn("THROTTLE: %s  --- STEERING: %s", message.linear.x, message.linear.z)
 
         self.actuators['throttle'].get_value_out(message.linear.x)
         self.actuators['steering'].get_value_out(message.angular.z)
@@ -106,13 +103,6 @@ class ServoController:
         """
         Sends converted steering information to servos.
         geometry_msgs/Twist converted data will be sent on topic /servos_absolute.
-        """
-
-        """
-        TODO TEST IMPLEMENTATION
-        for i in range(len(self.actuators)):
-            self._servo_msg.servos[i].servo = self.actuators[i].id
-            self._servo_msg.servos[i].value = self.actuators[i].value_out
         """
 
         for actuator_name, servo_obj in self.actuators.items():
