@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-### Project Overview
+### Legacy Files
 This repository contains the code for a minor-level university project focused on developing a self-driving car prototype.
 Currently, there is only the code adjustments to the [Donkeycar](https://github.com/autorope/donkeycar) software published.
 
