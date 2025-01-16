@@ -7,7 +7,6 @@
 
 <launch>
     <arg name="controller"          default="false"/>
-    <arg name="rtab_db"             default="~/.ros/robo_recon_rtab.db"/>
 
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="align_depth" value="true"/>
@@ -20,7 +19,7 @@
     <node pkg="i2cpwm_board" type="i2cpwm_board" name="i2cBoard"/>
 
     <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
-        <arg name="database_path" value="$(arg rtab_db)"/>
+        <arg name="args" value="--delete_db_on_start"/>
         <arg name="rgb_topic" value="/camera/color/image_raw"/>
         <arg name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/>
         <arg name="camera_info_topic" value="/camera/color/camera_info"/>

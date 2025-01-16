@@ -60,12 +60,9 @@ class ServoController:
         """
         rospy.loginfo("Setting Up the Node...")
 
-        max_throttle = rospy.get_param('max_throttle', 1)
-        max_steering = rospy.get_param('max_steering', 1)
-
-        rospy.logwarn("[MAX] THROTTLE: %s  --- STEERING: %s", max_throttle, max_steering)
-
         rospy.init_node('i2c_controller')
+        max_throttle = rospy.get_param('~max_throttle', 1)
+        max_steering = rospy.get_param('~max_steering', 1)
 
         self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=max_throttle),
                           'steering': ServoConvert(id=9, center_value=355, range=80, max_value=max_steering)}
