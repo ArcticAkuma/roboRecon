@@ -5,7 +5,6 @@ from i2cpwm_board.msg import Servo, ServoArray
 from geometry_msgs.msg import Twist
 import time
 
-# todo: as ROS parameters for different input sources (if existent)
 # SERVO VALUES
 #
 # STEERING IDLE	350
@@ -15,12 +14,6 @@ import time
 # MAX RIGHT	310
 # MAX FORWARDS	360 (350)
 # MAX BACKWARDS	300 (310)
-#
-#
-# FROM PS5 CONTROLLER @ /cmd_vel
-#
-# MAX message.linear.x  +/- 1.5
-# MAX message.angular.z +/- 0.4
 
 IDLE_TIMEOUT = 5
 
@@ -58,11 +51,11 @@ class ServoController:
         Configure ROS node: Register publisher and subscriber node.
         Initialize last controller input as current time to fore one idle update.
         """
-        rospy.loginfo("Setting Up the Node...")
 
         rospy.init_node('i2c_controller')
         max_throttle = rospy.get_param('~max_throttle', 1)
         max_steering = rospy.get_param('~max_steering', 1)
+        rospy.loginfo("Setting Up the Node...")
 
         self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=max_throttle),
                           'steering': ServoConvert(id=9, center_value=355, range=80, max_value=max_steering)}
@@ -86,8 +79,6 @@ class ServoController:
         """
 
         self._last_time_cmd_rcv = time.time()
-
-        rospy.logwarn("THROTTLE: %s  --- STEERING: %s", message.linear.x, message.linear.z)
 
         self.actuators['throttle'].get_value_out(message.linear.x)
         self.actuators['steering'].get_value_out(message.angular.z)
