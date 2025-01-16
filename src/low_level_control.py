@@ -60,10 +60,15 @@ class ServoController:
         """
         rospy.loginfo("Setting Up the Node...")
 
+        max_throttle = rospy.get_param('max_throttle', 1)
+        max_steering = rospy.get_param('max_steering', 1)
+
+        rospy.logwarn("[MAX] THROTTLE: %s  --- STEERING: %s", max_throttle, max_steering)
+
         rospy.init_node('i2c_controller')
 
-        self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=1),
-                          'steering': ServoConvert(id=9, center_value=355, range=80, max_value=1)}
+        self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=max_throttle),
+                          'steering': ServoConvert(id=9, center_value=355, range=80, max_value=max_steering)}
         # todo: load from ROS parameter (this are PS5 settings)
         self._servo_msg = ServoArray()
         for i in range(2):
