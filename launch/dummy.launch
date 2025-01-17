@@ -1,5 +1,8 @@
 <launch>
-    <arg name="controller"          default="false"/>
+    <arg name="joystick"          default="false"/>
+
+    <arg name="pin_throttle"             default="8"/>
+    <arg name="pin_steering"             default="9"/>
 
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="align_depth" value="true"/>
@@ -37,15 +40,17 @@
     <param name="/ukf_se/odom0_twist_rejection_threshold" value="10000000"/> -->
     <param name="/ukf_se/use_control" value="false"/>
 
-    <group if="$(arg controller)">
+    <group if="$(arg joystick)">
         <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
         <node pkg="robo_recon" type="low_level_control.py" name="roboReconController">
+            <param name="pin_throttle" value="$(arg pin_throttle)"/>
+            <param name="pin_steering" value="$(arg pin_steering)"/>
             <param name="max_throttle" value="1.5"/>
             <param name="max_steering" value="0.4"/>
         </node>
     </group>
 
-    <group unless="$(arg controller)">
+    <group unless="$(arg joystick)">
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
             <rosparam file="$(find robo_recon)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
             <rosparam file="$(find robo_recon)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />

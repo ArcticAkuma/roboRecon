@@ -53,26 +53,22 @@ class ServoController:
         """
 
         rospy.init_node('i2c_controller')
-        # todo: cfg -> pin_throttle, pin_steering
+        pin_throttle = rospy.get_param('~pin_throttle', 0)
+        pin_steering = rospy.get_param('~pin_steering', 1)
         max_throttle = rospy.get_param('~max_throttle', 1)
         max_steering = rospy.get_param('~max_steering', 1)
-        rospy.loginfo("Setting Up the Node...")
 
-        self.actuators = {'throttle': ServoConvert(id=8, center_value=330, range=60, max_value=max_throttle),
-                          'steering': ServoConvert(id=9, center_value=355, range=80, max_value=max_steering)}
-        # todo: load from ROS parameter (this are PS5 settings)
+        self.actuators = {'throttle': ServoConvert(id=pin_throttle, center_value=330, range=60, max_value=max_throttle),
+                          'steering': ServoConvert(id=pin_steering, center_value=355, range=80, max_value=max_steering)}
+
         self._servo_msg = ServoArray()
-
-        #for i in range(self.actuators.__len__()):
-        for i in range(2):
+        for i in range(len(self.actuators)):
             self._servo_msg.servos.append(Servo())
 
         self.ros_pub_servo_array = rospy.Publisher("/servos_absolute", ServoArray, queue_size=1)
         self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmd_vel)
 
         self._last_time_cmd_rcv = time.time()
-
-        rospy.loginfo("Initialization complete")
 
     def set_actuators_from_cmd_vel(self, message):
         """
@@ -101,15 +97,11 @@ class ServoController:
         geometry_msgs/Twist converted data will be sent on topic /servos_absolute.
         """
 
-        # items = list(self.actuators.items())
-        # for i in range(items.__len__()):
-        #     actuator_name, servo_obj = items[i]
-        #     self._servo_msg.servos[i].servo = servo_obj.id
-        #     self._servo_msg.servos[i].value = servo_obj.value_out
-
-        for actuator_name, servo_obj in self.actuators.items():
-            self._servo_msg.servos[servo_obj.id - 8].servo = servo_obj.id
-            self._servo_msg.servos[servo_obj.id - 8].value = servo_obj.value_out
+        items = list(self.actuators.items())
+        for i in range(len(items)):
+            actuator_name, servo_obj = items[i]
+            self._servo_msg.servos[i].servo = servo_obj.id
+            self._servo_msg.servos[i].value = servo_obj.value_out
 
         self.ros_pub_servo_array.publish(self._servo_msg)
 

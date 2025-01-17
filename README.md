@@ -29,11 +29,12 @@ A multi-sensor setup could significantly improve the accuracy, reliability, and 
 * **[librealsense2](https://github.com/IntelRealSense/librealsense):** ```sudo apt install ros-noetic-librealsense2*```
 * **[realsense2](https://github.com/IntelRealSense/realsense-ros/tree/ros1-legacy):** ```sudo apt install ros-noetic-realsense2-*```
 * **[robot_localization](http://wiki.ros.org/robot_localization):** ```sudo apt install ros-noetic-robot-localization```
-* **[rtabmap_ros](http://wiki.ros.org/rtabmap_ros):** ```sudo apt install ros-noetic-rtabmap-ros```
+* **[rtabmap](http://wiki.ros.org/rtabmap_ros):** ```sudo apt install ros-noetic-rtabmap-ros```
 * **[depthimage_to_laserscan](http://wiki.ros.org/depthimage_to_laserscan):** ```sudo apt install ros-noetic-depthimage-to-laserscan```
 * **[joy](http://wiki.ros.org/joy):** ```sudo apt install ros-noetic-joy```
 * **[navigation](http://wiki.ros.org/navigation):** ```sudo apt install ros-noetic-navigation```
-* **[ros-i2cpwmboards](https://github.com/EricWiener/ros-i2cpwmboards):** ```git clone https://github.com/EricWiener/ros-i2cpwmboards.git```
+* **[teleop_twist_joy](https://github.com/EricWiener/ros-i2cpwmboards):** ```git clone https://github.com/EricWiener/ros-i2cpwmboards.git```
+* **[i2cpwmboards](http://wiki.ros.org/teleop_twist_joy):** ```git clone https://github.com/ros-teleop/teleop_twist_joy.git```
 
 ### Installation
 * Create a ROS workspace
@@ -59,23 +60,24 @@ A multi-sensor setup could significantly improve the accuracy, reliability, and 
     ```
 
 ### Usage
-Please be aware, that the i2c addresses of the servos are currently hard-coded with no possibility to be changed from the launch file.
-You may need to adjust them [here](src/low_level_control.py#L60).
 1. **Start SLAM & navigation**<p>
     Currently, there is no automatic goal finding.<br/> 
     Set it by publishing a [geometry_msgs/PoseStamped](https://docs.ros.org/en/api/geometry_msgs/html/msg/PoseStamped.html) to the navigation [move_base](http://wiki.ros.org/move_base#Action_Subscribed_Topics) on move_base_simple/goal.
    ```bash
    roslaunch robo_recon recon.launch
     ```
-   There are two arguments, that can be set:
-    * controller (default: false): If 'true' enables steering with a DualSense controller, but disables navigation stack.
+   Available arguments:
+    * joystick (default: false): If 'true' enables steering with a DualSense controller, but disables navigation stack.
     * rtab_db (default: ~/.ros/robo_recon_rtab.db): Sets the location of the generated rtabmap database file. Can be used for multi-session operations.
+    * pin_throttle (default: 8): Sets the channel the throttle servo is connected to on the PCA9685 board.
+    * pin_steering (default: 9): Sets the channel the steering servo is connected to on the PCA9685 board.
     ```bash
-    roslaunch robo_recon recon.launch controller:=[true/false] rtab_db:=[path/to/rtabmap.db]
+    roslaunch robo_recon recon.launch joystick:=[true/false] rtab_db:=[path/to/rtabmap.db] pin_throttle:=[pin_throttle] pin_steering:=[pin_steering] 
     ```
 2. **Drive only (no SLAM, no navigation)**<p>
     Possibility to drive using a DualSense controller.<br/> 
-    When using other controllers it might be necessary to change 'max_throttle' and 'max_steering' parameters to accommodate for maximum joystick input.
+    When using other controllers it might be necessary to change 'max_throttle' and 'max_steering' parameters to accommodate for maximum joystick input.<br/>
+    Available arguments: pin_throttle, pin_steering (see above)
    ```bash
    roslaunch robo_recon joystick.launch
     ```
@@ -86,7 +88,8 @@ You may need to adjust them [here](src/low_level_control.py#L60).
     ```
 4. **Dummy.launch??**<p>
     This is the same implementation as in _1. Start SLAM & navigation_, but it will always start SLAM from scratch.<br/>
-    It also provides the controller argument as detailed above. 
+    It also provides the controller argument as detailed above. <br/>
+    Available arguments: controller, pin_throttle, pin_steering (see above)
    ```bash
    roslaunch robo_recon dummy.launch
     ```

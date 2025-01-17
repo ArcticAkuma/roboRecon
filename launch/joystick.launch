@@ -1,7 +1,12 @@
 <launch>
+    <arg name="pin_throttle"             default="8"/>
+    <arg name="pin_steering"             default="9"/>
+
     <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
     <node pkg="i2cpwm_board" type="i2cpwm_board" name="i2cBoard"/>
     <node pkg="robo_recon" type="low_level_control.py" name="roboReconController">
+        <param name="pin_throttle" value="$(arg pin_throttle)"/>
+        <param name="pin_steering" value="$(arg pin_steering)"/>
         <param name="max_throttle" value="1.5"/>
         <param name="max_steering" value="0.4"/>
     </node>
