@@ -62,6 +62,8 @@ class ServoController:
                           'steering': ServoConvert(id=9, center_value=355, range=80, max_value=max_steering)}
         # todo: load from ROS parameter (this are PS5 settings)
         self._servo_msg = ServoArray()
+
+        #for i in range(self.actuators.__len__()):
         for i in range(2):
             self._servo_msg.servos.append(Servo())
 
@@ -98,6 +100,12 @@ class ServoController:
         Sends converted steering information to servos.
         geometry_msgs/Twist converted data will be sent on topic /servos_absolute.
         """
+
+        # items = list(self.actuators.items())
+        # for i in range(items.__len__()):
+        #     actuator_name, servo_obj = items[i]
+        #     self._servo_msg.servos[i].servo = servo_obj.id
+        #     self._servo_msg.servos[i].value = servo_obj.value_out
 
         for actuator_name, servo_obj in self.actuators.items():
             self._servo_msg.servos[servo_obj.id - 8].servo = servo_obj.id
