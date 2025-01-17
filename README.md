@@ -22,7 +22,7 @@ A multi-sensor setup could significantly improve the accuracy, reliability, and 
 
 ### Prerequisites
 **General:**
-* **[Nvidia JetPack](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit) 5.1.4** @ Ubuntu 20.04
+* **[Nvidia JetPack](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit)** 5.1.4 @ Ubuntu 20.04
 * **[ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu)** (ros-noetic-desktop recommended)
 
 **ROS packages:**
@@ -61,7 +61,7 @@ A multi-sensor setup could significantly improve the accuracy, reliability, and 
 
 ### Usage
 1. **Start SLAM & navigation**<p>
-    Currently, there is no automatic goal finding.<br/> 
+    Currently, there is no automatic goal determination.<br/> 
     Set it by publishing a [geometry_msgs/PoseStamped](https://docs.ros.org/en/api/geometry_msgs/html/msg/PoseStamped.html) to the navigation [move_base](http://wiki.ros.org/move_base#Action_Subscribed_Topics) on move_base_simple/goal.
    ```bash
    roslaunch robo_recon recon.launch
