@@ -33,8 +33,8 @@ A multi-sensor setup could significantly improve the accuracy, reliability, and 
 * **[depthimage_to_laserscan](http://wiki.ros.org/depthimage_to_laserscan):** ```sudo apt install ros-noetic-depthimage-to-laserscan```
 * **[joy](http://wiki.ros.org/joy):** ```sudo apt install ros-noetic-joy```
 * **[navigation](http://wiki.ros.org/navigation):** ```sudo apt install ros-noetic-navigation```
-* **[teleop_twist_joy](https://github.com/EricWiener/ros-i2cpwmboards):** ```git clone https://github.com/EricWiener/ros-i2cpwmboards.git```
-* **[i2cpwmboards](http://wiki.ros.org/teleop_twist_joy):** ```git clone https://github.com/ros-teleop/teleop_twist_joy.git```
+* **[i2cpwmboards](https://github.com/EricWiener/ros-i2cpwmboards):** ```git clone https://github.com/EricWiener/ros-i2cpwmboards.git```
+* **[teleop_twist_joy](http://wiki.ros.org/teleop_twist_joy):** ```git clone https://github.com/ros-teleop/teleop_twist_joy.git```
 
 ### Installation
 * Create a ROS workspace
