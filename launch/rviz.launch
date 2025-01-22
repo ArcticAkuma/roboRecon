@@ -1,3 +1,4 @@
 <launch>
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find robo_recon)/resources/rviz_robo_recon.rviz" />
+    <!-- Start rviz node and autoload robo_recon config -->
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find robo_recon)/resources/rviz_robo_recon.rviz" />
 </launch>

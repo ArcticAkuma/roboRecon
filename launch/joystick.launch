@@ -1,12 +1,16 @@
 <launch>
+
+    <!-- Define arguments of launch file -->
     <arg name="pin_throttle"             default="8"/>
     <arg name="pin_steering"             default="9"/>
 
+    <!-- Start nodes to operate vehicle with joystick -->
     <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
     <node pkg="i2cpwm_board" type="i2cpwm_board" name="i2c_board"/>
     <node pkg="robo_recon" type="low_level_control.py" name="robo_recon_controller">
         <param name="pin_throttle" value="$(arg pin_throttle)"/>
         <param name="pin_steering" value="$(arg pin_steering)"/>
+            <!-- Define maximum control values the node will receive -->
         <param name="max_throttle" value="1.5"/>
         <param name="max_steering" value="0.4"/>
     </node>

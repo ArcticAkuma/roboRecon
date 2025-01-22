@@ -1,8 +1,14 @@
-<launch>
-    <arg name="joystick"          default="false"/>
+<!-- For more information please see:
+  - https://dev.intelrealsense.com/docs/ros1-wrapper
+  - https://github.com/introlab/rtabmap_ros/blob/noetic-devel/rtabmap_launch/launch/rtabmap.launch
+  - https://github.com/cra-ros-pkg/robot_localization/blob/noetic-devel/params/ukf_template.yaml
+  -->
 
-    <arg name="pin_throttle"             default="8"/>
-    <arg name="pin_steering"             default="9"/>
+<launch>
+    <!-- Define arguments of launch file -->
+    <arg name="joystick"            default="false"/>
+    <arg name="pin_throttle"        default="8"/>
+    <arg name="pin_steering"        default="9"/>
 
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="align_depth" value="true"/>
@@ -10,6 +16,7 @@
 
     <node pkg="i2cpwm_board" type="i2cpwm_board" name="i2c_board"/>
 
+    <!-- Start rtabmap (used for SLAM and odometry) -->
     <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
         <arg name="args" value="--delete_db_on_start"/>
         <arg name="rgb_topic" value="/camera/color/image_raw"/>
@@ -20,6 +27,7 @@
         <arg name="rviz" value="false"/>
     </include>
 
+    <!-- Start nodes self-localize vehicle -->
     <include file="$(find robot_localization)/launch/ukf_template.launch"/>
     <param name="/ukf_se/frequency" value="30"/>
     <param name="/ukf_se/base_link_frame" value="camera_link"/>
@@ -33,22 +41,26 @@
     <param name="/ukf_se/odom0_relative" value="false"/>
     <param name="/ukf_se/use_control" value="false"/>
 
+    <!-- Start nodes to operate vehicle with joystick -->
     <group if="$(arg joystick)">
         <include file="$(find teleop_twist_joy)/launch/teleop.launch"/>
 
         <node pkg="robo_recon" type="low_level_control.py" name="robo_recon_controller">
             <param name="pin_throttle" value="$(arg pin_throttle)"/>
             <param name="pin_steering" value="$(arg pin_steering)"/>
+            <!-- Define maximum control values the node will receive -->
             <param name="max_throttle" value="1.5"/>
             <param name="max_steering" value="0.4"/>
         </node>
     </group>
 
+    <!-- Start nodes to operate vehicle via ROS navigation -->
     <group unless="$(arg joystick)">
         <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depth_img_to_laser_scan">
             <remap from="image" to="/camera/aligned_depth_to_color/image_raw"/>
         </node>
 
+        <!-- Configure ROS navigation stack -->
         <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
             <rosparam file="$(find robo_recon)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
             <rosparam file="$(find robo_recon)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
@@ -60,6 +72,7 @@
         <node pkg="robo_recon" type="low_level_control.py" name="robo_recon_controller">
             <param name="pin_throttle" value="$(arg pin_throttle)"/>
             <param name="pin_steering" value="$(arg pin_steering)"/>
+            <!-- Define maximum control values the node will receive -->
             <param name="max_throttle" value="1.0"/>
             <param name="max_steering" value="1.0"/>
         </node>

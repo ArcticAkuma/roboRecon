@@ -1,10 +1,13 @@
+# For more information please see:
+# http://wiki.ros.org/base_local_planner#Parameters
+
 TrajectoryPlannerROS:
   max_vel_x: 1.0
-  min_vel_x: 1.0  #todo -1.0 for reverse?
+  min_vel_x: 1.0
   max_vel_theta: 1.0
   min_in_place_vel_theta: 0.4
 
-  acc_lim_theta: 2.0  #todo default == 3.2
+  acc_lim_theta: 2.0
   acc_lim_x: 2.5
   acc_lim_y: 2.5
 
